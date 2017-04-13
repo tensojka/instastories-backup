@@ -42,6 +42,7 @@ while len(ids) > 0:
 
 conn.commit()
 
+print()
 print("Downloading new videos and photos, printing names of new files:")
 
 todelete = []
