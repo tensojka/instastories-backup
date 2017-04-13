@@ -27,7 +27,7 @@ To run the program:
 ```
 $ python3 main.py
 ```
-You will have to run it every 24 hours in order to catch all Stories by the people you follow.
+You will have to run it every 24 hours in order to catch all Stories by the people you follow before they disappear
 
 ## Navigating program output
 Exclamation marks (!) mean that a Stories entry we tried to crawl is already in the database and dots (.) mean that an entry has been successfully added to the database.

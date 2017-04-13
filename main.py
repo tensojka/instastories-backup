@@ -2,6 +2,7 @@
 import requests
 import sqlite3
 import json
+import os
 
 try:
     with open('prefs.json') as json_data:
@@ -9,17 +10,15 @@ try:
 except FileNotFoundError:
     print("prefs.json file not found in current directory. Exiting.")
     exit()
-ids = prefs["ids"]
-headers = prefs["headers"]
 
 conn = sqlite3.connect(prefs["dbfilename"])
 c = conn.cursor()
 c.execute("CREATE TABLE IF NOT EXISTS `entries` (`id`	TEXT UNIQUE, `url`	TEXT, `userid`	TEXT, `username` TEXT, `taken_at` INTEGER, `filename` TEXT);")
-print("Loading new entries to DB")
+if not prefs["quiet"]: print("Loading new entries to DB")
 
-while len(ids) > 0:
-    pair = ids.popitem()
-    response = requests.request("GET", "https://i.instagram.com/api/v1/feed/user/"+pair[0]+"/reel_media/", headers=headers)
+while len(prefs["ids"]) > 0:
+    pair = prefs["ids"].popitem()
+    response = requests.request("GET", "https://i.instagram.com/api/v1/feed/user/"+pair[0]+"/reel_media/", headers=prefs["headers"])
     if response.status_code != 200:
         print("ERROR: got "+response.status_code+" when fetching stories entries!")
         exit
@@ -36,17 +35,20 @@ while len(ids) > 0:
         try:
             c.execute('INSERT INTO entries VALUES(?,?,?,?,?,?)', (str(id),str(url),str(userid),str(username),taken_at,""))
         except sqlite3.IntegrityError: #is thrown when UNIQUE doesn't match
-            print('!', end='',flush=True)
+            if not prefs["quiet"]: print('!', end='',flush=True)
         else:
-            print('.', end='',flush=True)
+            if not prefs["quiet"]: print('.', end='',flush=True)
 
 conn.commit()
 
-print()
-print("Downloading new videos and photos, printing names of new files:")
+if not prefs["quiet"]:
+    print()
+    print("Downloading new videos and photos, printing names of new files:")
 
 todelete = []
 toupdate = []
+if not os.path.exists(prefs["filesdir"]):
+    os.makedirs(prefs["filesdir"])
 
 for row in c.execute('SELECT * FROM entries WHERE filename = ""'):
     r = requests.get(row[1])
@@ -65,7 +67,7 @@ for row in c.execute('SELECT * FROM entries WHERE filename = ""'):
                 if chunk: # filter out keep-alive new chunks
                     f.write(chunk)
         toupdate.append((filename,row[0]))
-        print(filename)
+        if not prefs["quiet"]: print(filename)
 
 for item in todelete:
     c.execute('DELETE FROM entries WHERE id = ?',(item,))
