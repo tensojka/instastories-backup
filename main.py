@@ -14,12 +14,15 @@ headers = prefs["headers"]
 
 conn = sqlite3.connect(prefs["dbfilename"])
 c = conn.cursor()
-
+c.execute("CREATE TABLE IF NOT EXISTS `entries` (`id`	TEXT UNIQUE, `url`	TEXT, `userid`	TEXT, `username` TEXT, `taken_at` INTEGER, `filename` TEXT);")
 print("Loading new entries to DB")
 
 while len(ids) > 0:
     pair = ids.popitem()
     response = requests.request("GET", "https://i.instagram.com/api/v1/feed/user/"+pair[0]+"/reel_media/", headers=headers)
+    if response.status_code != 200:
+        print("ERROR: got "+response.status_code+" when fetching stories entries!")
+        exit
     response = json.loads(response.text)
     for item in response['items']:
         id = item['id']
@@ -68,9 +71,3 @@ for item in todelete:
 for item in toupdate:
     c.execute('UPDATE entries SET filename = ? WHERE id = ?',item)
 conn.commit()
-    #CREATE TABLE `entries` (
-    #    `id`	TEXT UNIQUE,
-    #    `url`	TEXT,
-    #    `userid`	TEXT,
-    #    `username`	TEXT
-    #);

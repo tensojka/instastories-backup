@@ -1,6 +1,5 @@
 files/
 stories.sqlite3
 .vscode/
-prefs.json
 *.pyc
 __pycache__/
