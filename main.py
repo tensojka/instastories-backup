@@ -20,7 +20,7 @@ while len(prefs["ids"]) > 0:
     pair = prefs["ids"].popitem()
     response = requests.request("GET", "https://i.instagram.com/api/v1/feed/user/"+pair[0]+"/reel_media/", headers=prefs["headers"])
     if response.status_code != 200:
-        print("ERROR: got "+response.status_code+" when fetching stories entries!")
+        print("ERROR: got "+str(response.status_code)+" when fetching stories entries!")
         exit
     response = json.loads(response.text)
     for item in response['items']:
@@ -56,12 +56,14 @@ for row in c.execute('SELECT * FROM entries WHERE filename = ""'):
         todelete.append(row[0])
     elif r.status_code%200 < 100:
         if r.headers["Content-Type"] == "video/mp4":
-            filename = str(row[3])+":"+str(row[4])+".mp4"
+            filename = str(row[3])+"/"+str(row[4])+".mp4"
         elif r.headers["Content-Type"] == "image/jpeg":
-            filename = str(row[3])+":"+str(row[4])+".jpg"
+            filename = str(row[3])+"/"+str(row[4])+".jpg"
         else:
-            filename = str(row[3])+":"+str(row[4])+".unknown"
+            filename = str(row[3])+"/"+str(row[4])+".unknown"
             print("WARNING: couldn't identify MIME type for URL "+row[1])
+        if not os.path.exists(prefs["filesdir"]+"/"+str(row[3])):
+            os.makedirs(prefs["filesdir"]+"/"+str(row[3]))
         with open(prefs["filesdir"]+"/"+filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk: # filter out keep-alive new chunks
