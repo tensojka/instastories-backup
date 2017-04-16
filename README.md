@@ -5,7 +5,7 @@ First, clone this repo.
 
 ## Obtain cookies
 
-You will need to get the cookie: header to be sent to Instagram to authenticate it's you. Instagram allows only authenticated users to watch Stories. To obtain the cookie, login into (http://instagram.com)[instagram.com].
+You will need to get the cookie: header to be sent to Instagram to authenticate it's you. Instagram allows only authenticated users to watch Stories. To obtain the cookie, login into http://instagram.com.
 
 Chrome: Open Developer Tools, change to the Network tab, reload `instagram.com`, scroll up in the request list, click instagram.com, find __cookie:__ under Request headers in the Headers pane. Copy the contents of __cookie:__, and paste them into your `prefs.json` in place of whatever was in `cookie:` field now.
 
