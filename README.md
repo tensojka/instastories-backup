@@ -7,15 +7,15 @@ First, clone this repo.
 
 You will need to get the cookie: header to be sent to Instagram to authenticate it's you. Instagram allows only authenticated users to watch Stories. To obtain the cookie, login into (http://instagram.com)[instagram.com].
 
-Chrome: Open Developer Tools, change to the Network tab, reload `instagram.com`, scroll up in the request list, click instagram.com, find __cookie:__ under Request headers, under Headers. Copy the contents of __cookie:__, and paste them into your `prefs.json` in place of whatever was in `cookie:` field now.
+Chrome: Open Developer Tools, change to the Network tab, reload `instagram.com`, scroll up in the request list, click instagram.com, find __cookie:__ under Request headers in the Headers pane. Copy the contents of __cookie:__, and paste them into your `prefs.json` in place of whatever was in `cookie:` field now.
 
 ## Setup users to backup
-You will need to obtain the IDs of IG users whose Stories you want to backup. You can use [https://smashballoon.com/instagram-feed/find-instagram-user-id/](this service) to find them.
+You will need to obtain the IDs of IG users whose Stories you want to backup. You can use [this service](https://smashballoon.com/instagram-feed/find-instagram-user-id/) to find them.
 
 Edit the `"ids:"` section of `prefs.json`, replacing the examples with IDs and usernames of users whose Stories you want to backup.
 
 ## Install Python and dependencies
-This requires Python 3 and pip3 to be installed. You can download Python 3 at [https://www.python.org/downloads/](python.org/downloads). pip3 will be installed automatically with Python.
+This requires Python 3 and pip3 to be installed. You can download Python 3 at [python.org/downloads](https://www.python.org/downloads/). pip3 will be installed automatically with Python.
 
 Next, run this in terminal in the directory where you cloned this to.
 ```
