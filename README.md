@@ -15,11 +15,11 @@ You will need to obtain the IDs of IG users whose Stories you want to backup. Yo
 Edit the `"ids:"` section of `prefs.json`, replacing the examples with IDs and usernames of users whose Stories you want to backup.
 
 ## Install Python and dependencies
-This requires Python 3 and pip3 to be installed. You can download Python 3 at [python.org/downloads](https://www.python.org/downloads/). pip3 will be installed automatically with Python.
+This requires Python 3 and pip3 to be installed. You can download Python 3 at [python.org/downloads](https://www.python.org/downloads/). pip3 should be installed automatically with Python.
 
 Next, run this in terminal in the directory where you cloned this to.
 ```
-# pip3 install requests
+# pip3 install -r requirements.txt
 ```
 
 # Running
@@ -27,10 +27,14 @@ To run the program:
 ```
 $ python3 main.py
 ```
-You will have to run it every 24 hours in order to catch all Stories by the people you follow before they disappear
+You will have to run it every 24 hours in order to catch all Stories by the people you follow before they disappear.
+
+You can set `quiet` in `prefs.json` to suppress all program output except errors. Useful for running via cron.
 
 ## Navigating program output
 Exclamation marks (!) mean that a Stories entry we tried to crawl is already in the database and dots (.) mean that an entry has been successfully added to the database.
 
 # Working with collected data
-The script saves all metadata into the SQLite3 database `stories.sqlite3` and by default downloads media into files/
+The script saves all metadata into the SQLite3 database `stories.sqlite3` and by default downloads media into files/username, where username is whatever you specified in `prefs.json`.
+
+It doesn't check the username against IG, it only instructs the program to what directory should the media get downloaded.
