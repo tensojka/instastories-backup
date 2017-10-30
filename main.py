@@ -55,7 +55,7 @@ for row in c.execute('SELECT * FROM entries WHERE filename = ""'):
     if r.status_code == 404:
         todelete.append(row[0])
     elif r.status_code%200 < 100:
-        if r.headers["Content-Type"] == "video/mp4":
+        if r.headers["Content-Type"] == "video/mp4" or r.headers["Content-Type"] == "text/plain":
             filename = str(row[3])+"/"+str(row[4])+".mp4"
         elif r.headers["Content-Type"] == "image/jpeg":
             filename = str(row[3])+"/"+str(row[4])+".jpg"
