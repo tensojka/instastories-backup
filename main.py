@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import bs4
 import json
 import os
 import requests
@@ -23,11 +22,9 @@ def create_db(prefs):
     return conn
 
 def fetch_user_id(username):
-    r = requests.get("https://smashballoon.com/instagram-feed/find-instagram-user-id/?username=" + username + "&896914zje22267qjtl=4")
-    soup = bs4.BeautifulSoup(r.text, "lxml")
-    div = str(soup.find("div", id="show_id"))
-    user_id = re.search('(?:User\ ID:<\/b>\s)(\d+)', div).groups()[0]
-    return user_id
+    r = requests.get("https://www.instagram.com/" + username + "/?__a=1")
+    userid = json.loads(r.text)["user"]["id"]
+    return userid
 
 def fetch_stories(prefs, session, conn):
     for username in prefs["usernames"]:
