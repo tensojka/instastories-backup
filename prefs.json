@@ -1,15 +1,11 @@
 {
     "filesdir": "files",
     "dbfilename": "stories.sqlite3",
-    "ids": {
-        "25025320": "instagram",
-        "150514": "pketron"
-    },
-    "headers": {
-        "cookie": "insert your cookies here",
-        "user-agent": "Instagram 10.3.2 (iPhone7,2; iPhone OS 9_3_3; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/420+",
-        "cache-control": "no-cache",
-        "x-ig-capabilities": "36oD"
-    },
+    "username": "insert username",
+    "password": "insert password",
+    "usernames": [
+        "instagram",
+        "pketron"
+    ],
     "quiet": false
 }
