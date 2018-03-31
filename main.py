@@ -14,7 +14,7 @@ def get_prefs():
         print("prefs.json file not found in current directory. Exiting.")
         exit()
 
-def create_db(prefs):
+def get_db(prefs):
     conn = sqlite3.connect(prefs["dbfilename"])
     c = conn.cursor()
     c.execute("CREATE TABLE IF NOT EXISTS `entries` (`id`	TEXT UNIQUE, `url`	TEXT, `userid`	TEXT, `username` TEXT, `taken_at` INTEGER, `filename` TEXT);")
@@ -23,13 +23,12 @@ def create_db(prefs):
 
 def fetch_user_id(username):
     r = requests.get("https://www.instagram.com/" + username + "/?__a=1")
-    userid = json.loads(r.text)["user"]["id"]
+    userid = json.loads(r.text)["graphql"]["user"]["id"]
     return userid
 
 def fetch_stories(prefs, session, conn):
-    for username in prefs["usernames"]:
+    for userid,username in prefs["ids"].items():
         print(username)
-        userid = fetch_user_id(username)
         response = session.get("https://i.instagram.com/api/v1/feed/user/"+ userid +"/reel_media/", headers={
             'user-agent':"Instagram 10.3.2 (iPhone7,2; iPhone OS 9_3_3; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/420+",
             'cookie':'sessionid={0};'.format(session.cookies['sessionid'])
@@ -102,10 +101,27 @@ def get_login_session(prefs):
     session.post('https://www.instagram.com/accounts/login/ajax/', data=login_data, allow_redirects=True)
     return session
 
+#Ensure that the prefs are in correct format. If not, reformat them.
+def ensure_prefs(prefs):
+    if ('usernames' in prefs) and not ('ids' in prefs):
+        print("Reformatting prefs.json, fetching user ids...")
+        prefs['ids'] = {}
+        for user in prefs['usernames']:
+            prefs['ids'][fetch_user_id(user)] = user
+        
+        del prefs['usernames']
+
+        with open('prefs.json','w') as prefsfile:
+            json.dump(prefs,prefsfile,indent=4)
+        main()
+        raise SystemExit
+
+
 def main():
     prefs = get_prefs()
+    ensure_prefs(prefs)
     session = get_login_session(prefs)
-    conn = create_db(prefs)
+    conn = get_db(prefs)
     fetch_stories(prefs, session, conn)
     download_stories(prefs, session, conn)
 
