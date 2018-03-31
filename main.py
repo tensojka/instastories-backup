@@ -29,10 +29,13 @@ def fetch_user_id(username):
 def fetch_stories(prefs, session, conn):
     for userid,username in prefs["ids"].items():
         response = session.get("https://i.instagram.com/api/v1/feed/user/"+ userid +"/reel_media/")
+        responseobj = json.loads(response.text)
         if response.status_code != 200:
+            if responseobj['message'] == "Invalid target user.":
+                print("User "+username+" with id "+userid+" does not exist. Skipping.")
+                continue
             raise SystemExit("ERROR: got "+str(response.status_code)+" when fetching stories entries! Response: "+response.text)
-        response = json.loads(response.text)
-        for item in response['items']:
+        for item in responseobj['items']:
             id = item['id']
             try:
                 url = item['video_versions'][0]['url']
