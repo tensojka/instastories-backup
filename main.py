@@ -28,20 +28,14 @@ def fetch_user_id(username):
 
 def fetch_stories(prefs, session, conn):
     for userid,username in prefs["ids"].items():
-        print(username)
-        response = session.get("https://i.instagram.com/api/v1/feed/user/"+ userid +"/reel_media/", headers={
-            'user-agent':"Instagram 10.3.2 (iPhone7,2; iPhone OS 9_3_3; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/420+",
-            'cookie':'sessionid={0};'.format(session.cookies['sessionid'])
-        })
+        response = session.get("https://i.instagram.com/api/v1/feed/user/"+ userid +"/reel_media/")
         if response.status_code != 200:
-            print("ERROR: got "+str(response.status_code)+" when fetching stories entries!")
-            exit()
+            raise SystemExit("ERROR: got "+str(response.status_code)+" when fetching stories entries! Response: "+response.text)
         response = json.loads(response.text)
         for item in response['items']:
             id = item['id']
             try:
                 url = item['video_versions'][0]['url']
-                print(url)
             except KeyError: #if there are no videos of this item
                 url = item['image_versions2']['candidates'][0]['url']
             taken_at = item['taken_at']
@@ -94,11 +88,22 @@ def download_stories(prefs, session, conn):
 
 def get_login_session(prefs):
     session = requests.Session()
-    session.headers.update({'Referer': 'https://www.instagram.com/'})
-    req = session.get('https://www.instagram.com/')
-    session.headers.update({'X-CSRFToken': req.cookies['csrftoken']})
-    login_data = {'username': prefs['username'], 'password': prefs['password']}
-    session.post('https://www.instagram.com/accounts/login/ajax/', data=login_data, allow_redirects=True)
+    session.headers['user-agent'] = "Instagram 10.3.2 (iPhone7,2; iPhone OS 9_3_3; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/420+"
+    if ('username' in prefs) and ('password' in prefs):
+        session.headers.update({'Referer': 'https://www.instagram.com/'})
+        req = session.get('https://www.instagram.com/')
+        session.headers.update({'X-CSRFToken': req.cookies['csrftoken']})
+        login_data = {'username': prefs['username'], 'password': prefs['password']}
+        session.post('https://www.instagram.com/accounts/login/ajax/', data=login_data, allow_redirects=True)
+    elif 'headers' in prefs:
+        session.headers = prefs["headers"]
+    elif 'cookie' in prefs:
+        session.headers.update({'cookie': prefs['cookie']})
+        session.headers["x-ig-capabilities"] = "36oD"
+        session.headers["cache-control"] = "no-cache"
+
+    else:
+        raise AssertionError("prefs.json contains neither headers nor username. Cannot authenticate to IG.")
     return session
 
 #Ensure that the prefs are in correct format. If not, reformat them.
