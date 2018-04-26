@@ -22,9 +22,10 @@ def get_db(prefs):
     return conn
 
 def fetch_user_id(username):
-    r = requests.get("https://www.instagram.com/" + username + "/?__a=1")
-    userid = json.loads(r.text)["graphql"]["user"]["id"]
-    return userid
+    r = requests.get("https://www.instagram.com/" + username)
+    return (json.loads(re.findall(
+        r'(?<=window._sharedData = ).+(?=;</script>)',
+        r.text)[0])['entry_data']['ProfilePage'][0]['graphql']['user']['id'])
 
 def fetch_stories(prefs, session, conn):
     for userid,username in prefs["ids"].items():
@@ -116,7 +117,7 @@ def ensure_prefs(prefs):
         prefs['ids'] = {}
         for user in prefs['usernames']:
             prefs['ids'][fetch_user_id(user)] = user
-        
+
         del prefs['usernames']
 
         with open('prefs.json','w') as prefsfile:
